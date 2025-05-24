@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>COVID-19 Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background-color: #f5f7fb;
+      color: #333;
+      overflow-x: hidden;
+      flex-direction: row;
+    }
+
+    .sidebar {
+      background-color: #1e2a78;
+      color: #fff;
+      width: 260px;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .sidebar h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #c7d1ff;
+    }
+
+    .sidebar .profile-id {
+      font-size: 0.95rem;
+      color: #aeb7ff;
+    }
+
+    .sidebar .divider {
+      border-top: 1px solid #3c4585;
+      margin: 16px 0;
+    }
+
+    .back-button {
+      background-color: #3a6df0;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .back-button:hover {
+      background-color: #2a52c4;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .header {
+      background-color: #fff;
+      padding: 24px 32px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      color: #1e2a78;
+      font-weight: 600;
+      flex-grow: 1;
+      min-width: 200px;
+    }
+
+    .content {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .card {
+      background-color: #fff;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h2 {
+      color: #1e2a78;
+      margin-bottom: 16px;
+    }
+
+    label, p {
+      font-size: 1rem;
+      margin: 8px 0;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100%;
+      display: block;
+      max-width: 100%;
+      min-height: 300px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 60%;
+      font-size: 1rem;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 8px;
+      background-color: #3a6df0;
+      color: white;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2a52c4;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main-content {
+        width: 100%;
+      }
+
+      .header {
+        padding: 16px 24px;
+      }
+
+      .content {
+        padding: 24px 16px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      button {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      form {
+        flex-direction: column;
+      }
+
+      .content {
+        padding: 16px 12px;
+        gap: 24px;
+      }
+
+      canvas#casesChart {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="header">
+      <h1>COVID-19 Country Dashboard</h1>
+      <a href="index.html" class="back-button">Back to Dashboard</a>
+    </header>
+
+    <section class="content">
+      <!-- Stats -->
+      <div class="card">
+        <h2>Search by Country</h2>
+        <form id="searchForm">
+          <label for="countryInput">Enter country name:</label><br />
+          <input type="text" id="countryInput" placeholder="e.g. Malaysia" required />
+          <button type="submit">Search</button>
+        </form><br>
+
+        <h2 id="countryTitle">Current Statistics</h2>
+        <p>🦠 Total Cases: <span id="totalCases">--</span></p>
+        <p>📊 Active Cases: <span id="activeCases">--</span></p>
+        <p>💚 Recovered: <span id="recovered">--</span></p>
+        <p>⚰️ Deaths: <span id="deaths">--</span></p>
+        <p>😷 Cases Today: <span id="todayCases">--</span></p>
+      </div>
+
+      <!-- Chart -->
+      <div class="card">
+        <h2>📈 Cases Chart</h2>
+        <div style="overflow-x: auto;">
+        <canvas id="casesChart" width="600" height="300"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="covid.js"></script>
+
+</body>
+</html>
